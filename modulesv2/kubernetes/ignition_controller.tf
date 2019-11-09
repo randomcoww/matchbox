@@ -40,8 +40,8 @@ resource "matchbox_group" "ign-controller" {
       apiserver_local_endpoint = "https://127.0.0.1:${var.services.kubernetes_apiserver.ports.secure}"
       kubelet_path             = "/var/lib/kubelet"
 
-      tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
-      tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")
+      tls_kubernetes_ca          = replace(var.ca.kubernetes-ca.cert_pem, "\n", "\\n")
+      tls_kubernetes_ca_key      = replace(var.ca.kubernetes-ca.private_key_pem, "\n", "\\n")
       tls_kubernetes             = replace(tls_locally_signed_cert.kubernetes[each.key].cert_pem, "\n", "\\n")
       tls_kubernetes_key         = replace(tls_private_key.kubernetes[each.key].private_key_pem, "\n", "\\n")
       tls_controller_manager     = replace(tls_locally_signed_cert.controller-manager.cert_pem, "\n", "\\n")
@@ -49,10 +49,10 @@ resource "matchbox_group" "ign-controller" {
       tls_scheduler              = replace(tls_locally_signed_cert.scheduler.cert_pem, "\n", "\\n")
       tls_scheduler_key          = replace(tls_private_key.scheduler.private_key_pem, "\n", "\\n")
 
-      tls_service_account     = replace(tls_private_key.service-account.public_key_pem, "\n", "\\n")
-      tls_service_account_key = replace(tls_private_key.service-account.private_key_pem, "\n", "\\n")
+      tls_service_account     = replace(var.ca.service-account-ca.cert_pem, "\n", "\\n")
+      tls_service_account_key = replace(var.ca.service-account-ca.private_key_pem, "\n", "\\n")
 
-      tls_etcd_ca         = replace(tls_self_signed_cert.etcd-ca.cert_pem, "\n", "\\n")
+      tls_etcd_ca         = replace(var.ca.etcd-ca.cert_pem, "\n", "\\n")
       tls_etcd            = replace(tls_locally_signed_cert.etcd[each.key].cert_pem, "\n", "\\n")
       tls_etcd_key        = replace(tls_private_key.etcd[each.key].private_key_pem, "\n", "\\n")
       tls_etcd_client     = replace(tls_locally_signed_cert.etcd-client[each.key].cert_pem, "\n", "\\n")

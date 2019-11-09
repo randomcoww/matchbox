@@ -22,6 +22,10 @@ variable "services" {
   type = any
 }
 
+variable "ca" {
+  type = any
+}
+
 variable "live_hosts" {
   type = any
 }

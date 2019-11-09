@@ -27,7 +27,7 @@ resource "matchbox_group" "ign-worker" {
       apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
       kubelet_path       = "/var/lib/kubelet"
 
-      tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
+      tls_kubernetes_ca = replace(var.ca.kubernetes-ca.cert_pem, "\n", "\\n")
       tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
       tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
     })

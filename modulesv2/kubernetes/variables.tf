@@ -30,6 +30,10 @@ variable "container_images" {
   type = any
 }
 
+variable "ca" {
+  type = any
+}
+
 variable "controller_hosts" {
   type = any
 }

@@ -35,9 +35,9 @@ resource "tls_locally_signed_cert" "kubernetes" {
   for_each = var.controller_hosts
 
   cert_request_pem   = tls_cert_request.kubernetes[each.key].cert_request_pem
-  ca_key_algorithm   = tls_private_key.kubernetes-ca.algorithm
-  ca_private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+  ca_key_algorithm   = var.ca.kubernetes-ca.algorithm
+  ca_private_key_pem = var.ca.kubernetes-ca.private_key_pem
+  ca_cert_pem        = var.ca.kubernetes-ca.cert_pem
 
   validity_period_hours = 8760
 

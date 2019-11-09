@@ -29,9 +29,9 @@ resource "tls_locally_signed_cert" "etcd" {
   for_each = var.controller_hosts
 
   cert_request_pem   = tls_cert_request.etcd[each.key].cert_request_pem
-  ca_key_algorithm   = tls_private_key.etcd-ca.algorithm
-  ca_private_key_pem = tls_private_key.etcd-ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+  ca_key_algorithm   = var.ca.etcd-ca.algorithm
+  ca_private_key_pem = var.ca.etcd-ca.private_key_pem
+  ca_cert_pem        = var.ca.etcd-ca.cert_pem
 
   validity_period_hours = 8760
 

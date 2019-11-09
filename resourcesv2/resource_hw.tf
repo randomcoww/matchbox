@@ -31,10 +31,11 @@ module "hw" {
 
   user              = local.user
   password          = var.password
-  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
   mtu               = local.mtu
   networks          = local.networks
   services          = local.services
+  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
+  ca = local.ca
 
   # LiveOS base KS
   live_hosts = {
@@ -47,4 +48,19 @@ module "hw" {
   # only local renderer makes sense here
   # this resource creates non-local renderers
   renderer = local.local_renderer
+}
+
+##
+## client
+##
+locals {
+  renderers = {
+    for k in keys(module.hw.matchbox_rpc_endpoints) :
+    k => {
+      endpoint        = module.hw.matchbox_rpc_endpoints[k]
+      cert_pem        = tls_locally_signed_cert.cert["matchbox-client"].cert_pem
+      private_key_pem = tls_private_key.cert["matchbox-client"].private_key_pem
+      ca_pem          = tls_self_signed_cert.ca["matchbox-ca"].cert_pem
+    }
+  }
 }
