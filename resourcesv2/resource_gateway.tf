@@ -40,39 +40,7 @@ locals {
 }
 
 # Do this to each provider until for_each module is available
-# module "gateway-0" {
-#   source = "../modulesv2/gateway"
-
-#   user              = local.user
-#   mtu               = local.mtu
-#   networks          = local.networks
-#   services          = local.services
-#   domains           = local.domains
-#   container_images  = local.container_images
-#   gateway_hosts     = local.gateway_hosts
-#   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-
-#   # Render to one of KVM host matchbox instances
-#   renderer = local.renderers.kvm-0
-# }
-
-# module "gateway-1" {
-#   source = "../modulesv2/gateway"
-
-#   user              = local.user
-#   mtu               = local.mtu
-#   networks          = local.networks
-#   services          = local.services
-#   domains           = local.domains
-#   container_images  = local.container_images
-#   gateway_hosts     = local.gateway_hosts
-#   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-
-#   # Render to one of KVM host matchbox instances
-#   renderer = local.renderers.kvm-1
-# }
-
-module "gateway-local" {
+module "gateway-0" {
   source = "../modulesv2/gateway"
 
   user              = local.user
@@ -84,5 +52,22 @@ module "gateway-local" {
   gateway_hosts     = local.gateway_hosts
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
 
-  renderer = local.local_renderer
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers.kvm-0
+}
+
+module "gateway-1" {
+  source = "../modulesv2/gateway"
+
+  user              = local.user
+  mtu               = local.mtu
+  networks          = local.networks
+  services          = local.services
+  domains           = local.domains
+  container_images  = local.container_images
+  gateway_hosts     = local.gateway_hosts
+  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
+
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers.kvm-1
 }

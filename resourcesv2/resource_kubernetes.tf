@@ -46,51 +46,7 @@ locals {
 }
 
 # Do this to each provider until for_each module is available
-# module "kubernetes-0" {
-#   source = "../modulesv2/kubernetes"
-
-#   user              = local.user
-#   mtu               = local.mtu
-#   networks          = local.networks
-#   services          = local.services
-#   domains           = local.domains
-#   container_images  = local.container_images
-#   controller_hosts  = local.controller_hosts
-#   worker_hosts      = local.worker_hosts
-#   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-#   ca = local.ca
-
-#   cluster_name          = local.kubernetes_cluster_name
-#   s3_backup_aws_region  = "us-west-2"
-#   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
-
-#   # Render to one of KVM host matchbox instances
-#   renderer = local.renderers.kvm-0
-# }
-
-# module "kubernetes-1" {
-#   source = "../modulesv2/kubernetes"
-
-#   user              = local.user
-#   mtu               = local.mtu
-#   networks          = local.networks
-#   services          = local.services
-#   domains           = local.domains
-#   container_images  = local.container_images
-#   controller_hosts  = local.controller_hosts
-#   worker_hosts      = local.worker_hosts
-#   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-#   ca = local.ca
-
-#   cluster_name          = local.kubernetes_cluster_name
-#   s3_backup_aws_region  = "us-west-2"
-#   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
-
-#   # Render to one of KVM host matchbox instances
-#   renderer = local.renderers.kvm-0
-# }
-
-module "kubernetes-local" {
+module "kubernetes-0" {
   source = "../modulesv2/kubernetes"
 
   user              = local.user
@@ -102,13 +58,36 @@ module "kubernetes-local" {
   controller_hosts  = local.controller_hosts
   worker_hosts      = local.worker_hosts
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-  ca = local.ca
+  ca                = local.ca
 
   cluster_name          = local.kubernetes_cluster_name
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
 
-  renderer = local.local_renderer
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers.kvm-0
+}
+
+module "kubernetes-1" {
+  source = "../modulesv2/kubernetes"
+
+  user              = local.user
+  mtu               = local.mtu
+  networks          = local.networks
+  services          = local.services
+  domains           = local.domains
+  container_images  = local.container_images
+  controller_hosts  = local.controller_hosts
+  worker_hosts      = local.worker_hosts
+  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
+  ca                = local.ca
+
+  cluster_name          = local.kubernetes_cluster_name
+  s3_backup_aws_region  = "us-west-2"
+  s3_etcd_backup_bucket = "randomcoww-etcd-backup"
+
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers.kvm-1
 }
 
 # Write admin kubeconfig file

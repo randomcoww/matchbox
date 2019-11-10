@@ -35,7 +35,7 @@ module "hw" {
   networks          = local.networks
   services          = local.services
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-  ca = local.ca
+  ca                = local.ca
 
   # LiveOS base KS
   live_hosts = {
