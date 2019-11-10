@@ -26,8 +26,8 @@ resource "matchbox_group" "ign-controller" {
       etcd_cluster_token    = var.cluster_name
       s3_etcd_backup_path   = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
       aws_region            = var.s3_backup_aws_region
-      aws_access_key_id     = aws_iam_access_key.s3-etcd-backup.id
-      aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret
+      aws_access_key_id     = var.aws_access_key_id
+      aws_secret_access_key = var.aws_secret_access_key
       etcd_initial_cluster = join(",", [
         for k in keys(var.controller_hosts) :
         "${k}=https://${var.controller_hosts[k].network.store_ip}:${var.services.etcd.ports.peer}"

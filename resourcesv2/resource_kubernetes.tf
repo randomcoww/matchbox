@@ -1,5 +1,7 @@
 locals {
   kubernetes_cluster_name = "default-cluster"
+  s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
+
   controller_hosts = {
     controller-0 = {
       network = {
@@ -45,6 +47,32 @@ locals {
   }
 }
 
+resource "aws_iam_user" "s3-etcd-backup" {
+  name = "s3-etcd-backup-${local.kubernetes_cluster_name}"
+}
+
+resource "aws_iam_access_key" "s3-etcd-backup" {
+  user = aws_iam_user.s3-etcd-backup.name
+}
+
+resource "aws_iam_user_policy" "s3-etcd-backup-access" {
+  name = aws_iam_user.s3-etcd-backup.name
+  user = aws_iam_user.s3-etcd-backup.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          "arn:aws:s3:::${local.s3_etcd_backup_bucket}/${local.kubernetes_cluster_name}",
+          "arn:aws:s3:::${local.s3_etcd_backup_bucket}/${local.kubernetes_cluster_name}/*",
+        ]
+      }
+    ]
+  })
+}
+
 # Do this to each provider until for_each module is available
 module "kubernetes-0" {
   source = "../modulesv2/kubernetes"
@@ -62,7 +90,9 @@ module "kubernetes-0" {
 
   cluster_name          = local.kubernetes_cluster_name
   s3_backup_aws_region  = "us-west-2"
-  s3_etcd_backup_bucket = "randomcoww-etcd-backup"
+  s3_etcd_backup_bucket = local.s3_etcd_backup_bucket
+  aws_access_key_id     = aws_iam_access_key.s3-etcd-backup.id
+  aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret
 
   # Render to one of KVM host matchbox instances
   renderer = local.renderers.kvm-0
@@ -84,7 +114,9 @@ module "kubernetes-1" {
 
   cluster_name          = local.kubernetes_cluster_name
   s3_backup_aws_region  = "us-west-2"
-  s3_etcd_backup_bucket = "randomcoww-etcd-backup"
+  s3_etcd_backup_bucket = local.s3_etcd_backup_bucket
+  aws_access_key_id     = aws_iam_access_key.s3-etcd-backup.id
+  aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret
 
   # Render to one of KVM host matchbox instances
   renderer = local.renderers.kvm-1
