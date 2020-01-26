@@ -1,0 +1,84 @@
+%{ for n in keys(syncthing_nodes) }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${n}-tls
+  namespace: ${namespace}
+data:
+  tls.crt: ${replace(base64encode(chomp(syncthing_nodes[n].crt)), "\n", "")}
+  tls.key: ${replace(base64encode(chomp(syncthing_nodes[n].key)), "\n", "")}
+type: kubernetes.io/tls
+
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: ${n}
+  namespace: ${namespace}
+spec:
+  serviceName: syncthing
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: syncthing
+  template:
+    metadata:
+      labels:
+        k8s-app: syncthing
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: ${syncthing_nodes[n].node}
+      containers:
+      - name: syncthing
+        image: ${container_images.syncthing}
+        imagePullPolicy: Always
+        env:
+        - name: CONFIG
+          value: |
+            <configuration>
+              <folder id="sync" label="sync" path="/syncthing" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="0" autoNormalize="false">
+                %{~ for k in keys(syncthing_nodes) ~}
+                <device id="${syncthing_nodes[k].id}"></device>
+                %{~ endfor ~}
+                <maxConflicts>1</maxConflicts>
+              </folder>
+              %{~ for k in keys(syncthing_nodes) ~}
+              <device id="${syncthing_nodes[k].id}" compression="never" skipIntroductionRemovals="true">
+                <allowedNetwork>${networks.store.network}/${networks.store.cidr}</allowedNetwork>
+              </device>
+              %{~ endfor ~}
+              <gui enabled="false"/>
+              <options>
+                <listenAddress>0.0.0.0:${services.syncthing.ports.peer}</listenAddress>
+                <globalAnnounceEnabled>false</globalAnnounceEnabled>
+                <localAnnounceEnabled>true</localAnnounceEnabled>
+                <reconnectionIntervalS>5</reconnectionIntervalS>
+                <relaysEnabled>false</relaysEnabled>
+                <startBrowser>false</startBrowser>
+                <natEnabled>false</natEnabled>
+                <urAccepted>-1</urAccepted>
+                <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+                <defaultFolderPath></defaultFolderPath>
+              </options>
+            </configuration>
+        - name: TLS_CRT
+          valueFrom:
+            secretKeyRef:
+              name: ${n}-tls
+              key: tls.crt
+        - name: TLS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ${n}-tls
+              key: tls.key
+        volumeMounts:
+        - mountPath: /syncthing
+          name: syncthing-path
+      volumes:
+      - name: syncthing-path
+        hostPath:
+          path: ${syncthing_path}
+%{ endfor }

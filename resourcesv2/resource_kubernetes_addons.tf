@@ -33,6 +33,16 @@ module "kubernetes-addons" {
     }
   }
 
+  syncthing_path = "/pv/sync"
+  syncthing_pods = {
+    sync-0 = {
+      node = "worker-0"
+    }
+    sync-1 = {
+      node = "worker-1"
+    }
+  }
+
   # Render to one of KVM host matchbox instances
   # renderer = local.renderers[var.renderer]
   renderer = local.local_renderer

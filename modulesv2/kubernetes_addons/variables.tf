@@ -18,6 +18,14 @@ variable "secrets" {
   type = any
 }
 
+variable "syncthing_path" {
+  type = string
+}
+
+variable "syncthing_pods" {
+  type = any
+}
+
 variable "renderer" {
   type = map(string)
 }

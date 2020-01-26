@@ -95,9 +95,24 @@ output "worker_params" {
       apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
       kubelet_path       = "/var/lib/kubelet"
 
+      # syncthing_devices = join("", [
+      #   for k in keys(var.worker_hosts) :
+
+      #   <device id="syncthing-0" compression="always" skipIntroductionRemovals="true">
+      #     <address>syncthing-0:22000</address>
+      #     <allowedNetwork>${networks.kubernetes.network}/${networks.kubernetes.cidr}</allowedNetwork>
+      #   </device>
+
+      #   "https://${var.controller_hosts[k].host_network.store.ip}:${var.services.etcd.ports.client}"
+      # ])
+
+
       tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
       tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
       tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
+
+      # tls_syncthing     = replace(tls_locally_signed_cert.syncthing.cert_pem, "\n", "\\n")
+      # tls_syncthing_key = replace(tls_private_key.syncthing.private_key_pem, "\n", "\\n")
     }
   }
 }
